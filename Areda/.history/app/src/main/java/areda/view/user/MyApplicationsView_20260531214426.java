@@ -14,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class MyApplicationsView extends StackPane {
+
     private VBox mainContent;
     private StackPane modalOverlay;
     private VBox tableContainer;
@@ -25,15 +26,12 @@ public class MyApplicationsView extends StackPane {
         mainContent = new VBox(25);
         mainContent.setPadding(new Insets(30));
         mainContent.setAlignment(Pos.TOP_LEFT);
-
         HBox header = createHeader();
         HBox filterBar = createFilterBar();
         tableContainer = new VBox();
         tableContainer.setStyle("-fx-background-color: white;");
         refreshTable();
-
         mainContent.getChildren().addAll(header, filterBar, tableContainer);
-
         modalOverlay = new StackPane();
         modalOverlay.setStyle("-fx-background-color: rgba(0,0,0,0.4);");
         modalOverlay.setVisible(false);
@@ -46,8 +44,8 @@ public class MyApplicationsView extends StackPane {
         String selectedDivisi = divisiFilter.getValue();
         String selectedStatus = statusFilter.getValue();
 
-        HBox headerRow = createTableRow("No.", "Nama Lowongan", "Divisi", "Tanggal Melamar",
-                "Tanggal Interview", "Status", "Progress", true, null);
+        HBox headerRow = createTableRow("No.", "Nama Lowongan", "Divisi", "Tanggal Melamar", "Status", "Progress", true,
+                null);
         tableContainer.getChildren().add(headerRow);
 
         int no = 1;
@@ -62,14 +60,8 @@ public class MyApplicationsView extends StackPane {
                     || lamaran.statusTahapan.equals(selectedStatus));
 
             if (matchDivisi && matchStatus) {
-
-                String tanggalInterview = (lamaran.tanggalInterview != null && !lamaran.tanggalInterview.isEmpty())
-                        ? lamaran.tanggalInterview
-                        : "-";
-
-                tableContainer.getChildren().add(createTableRow(
-                        String.valueOf(no++), judul, divisi, lamaran.tanggal,
-                        tanggalInterview, lamaran.statusTahapan, "↗", false, lamaran));
+                tableContainer.getChildren().add(createTableRow(String.valueOf(no++), judul, divisi, lamaran.tanggal,
+                        lamaran.statusTahapan, "↗", false, lamaran));
             }
         }
 
@@ -132,8 +124,8 @@ public class MyApplicationsView extends StackPane {
         return bar;
     }
 
-    private HBox createTableRow(String no, String name, String div, String date,
-            String tanggalInterview, String status, String prog, boolean isHeader, Lamaran lamaran) {
+    private HBox createTableRow(String no, String name, String div, String date, String status, String prog,
+            boolean isHeader, Lamaran lamaran) {
         HBox row = new HBox();
         row.setPadding(new Insets(15, 10, 15, 10));
         row.setAlignment(Pos.CENTER_LEFT);
@@ -148,12 +140,6 @@ public class MyApplicationsView extends StackPane {
         Label lblName = createCellLabel(name, 200, isHeader);
         Label lblDiv = createCellLabel(div, 150, isHeader);
         Label lblDate = createCellLabel(date, 150, isHeader);
-
-        Label lblInterviewDate = createCellLabel(tanggalInterview, 150, isHeader);
-        if (!isHeader && !tanggalInterview.equals("-")) {
-            lblInterviewDate.setTextFill(Color.web("#2B6CB0")); // Biru untuk tanggal yang sudah dijadwalkan
-            lblInterviewDate.setFont(Font.font("Arial", FontWeight.BOLD, 13));
-        }
 
         Node statusNode;
         if (isHeader) {
@@ -190,7 +176,7 @@ public class MyApplicationsView extends StackPane {
             progBtn.setPrefSize(35, 30);
             progBtn.setOnAction(e -> {
                 Lowongan l = DatabaseManager.getLowonganById(lamaran.idLowongan);
-                showProgressModal(l != null ? l.judul : "Unknown", lamaran.statusTahapan, lamaran.tanggalInterview);
+                showProgressModal(l != null ? l.judul : "Unknown", lamaran.statusTahapan);
             });
 
             HBox cell = new HBox(10, progBtn);
@@ -199,7 +185,7 @@ public class MyApplicationsView extends StackPane {
             progNode = cell;
         }
 
-        row.getChildren().addAll(lblNo, lblName, lblDiv, lblDate, lblInterviewDate, statusNode, progNode);
+        row.getChildren().addAll(lblNo, lblName, lblDiv, lblDate, statusNode, progNode);
         return row;
     }
 
@@ -216,9 +202,9 @@ public class MyApplicationsView extends StackPane {
         return lbl;
     }
 
-    private void showProgressModal(String jobTitle, String statusTahapan, String tanggalInterview) {
+    private void showProgressModal(String jobTitle, String statusTahapan) {
         VBox modal = new VBox(25);
-        modal.setMaxSize(450, 500);
+        modal.setMaxSize(400, 450);
         modal.setPadding(new Insets(30));
         modal.setStyle("-fx-background-color: white; -fx-background-radius: 20;");
 
@@ -237,30 +223,6 @@ public class MyApplicationsView extends StackPane {
 
         header.getChildren().addAll(title, spacer, closeBtn);
 
-        VBox infoBox = new VBox(15);
-        if (tanggalInterview != null && !tanggalInterview.isEmpty()) {
-            HBox interviewInfo = new HBox(10);
-            interviewInfo.setAlignment(Pos.CENTER_LEFT);
-            interviewInfo.setPadding(new Insets(15));
-            interviewInfo.setStyle("-fx-background-color: #EBF8FF; -fx-background-radius: 10;");
-
-            Label icon = new Label("📅");
-            icon.setFont(Font.font(20));
-
-            VBox textBox = new VBox(5);
-            Label labelTitle = new Label("Jadwal Interview");
-            labelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 13));
-            labelTitle.setTextFill(Color.web("#2B6CB0"));
-
-            Label labelDate = new Label(tanggalInterview);
-            labelDate.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-            labelDate.setTextFill(Color.web("#1A202C"));
-
-            textBox.getChildren().addAll(labelTitle, labelDate);
-            interviewInfo.getChildren().addAll(icon, textBox);
-            infoBox.getChildren().add(interviewInfo);
-        }
-
         VBox timeline = new VBox(15);
         boolean isBerkas = statusTahapan.equals("Seleksi Berkas");
         boolean isInterview = statusTahapan.equals("Interview");
@@ -271,7 +233,7 @@ public class MyApplicationsView extends StackPane {
                 createTimelineStep("2", "Interview", isInterview || isFinal),
                 createTimelineStep("3", "Hasil Akhir: " + (isFinal ? statusTahapan : "Pending"), isFinal));
 
-        modal.getChildren().addAll(header, infoBox, timeline);
+        modal.getChildren().addAll(header, timeline);
 
         modalOverlay.getChildren().clear();
         modalOverlay.getChildren().add(modal);

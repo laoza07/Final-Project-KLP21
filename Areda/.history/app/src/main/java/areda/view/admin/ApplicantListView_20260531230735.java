@@ -212,11 +212,13 @@ public class ApplicantListView extends StackPane {
         Label nameLbl = new Label(app.namaPelamar);
         nameLbl.setFont(Font.font("Arial", FontWeight.BOLD, 18));
 
+        // STATUS COMBO
         ComboBox<String> statusCombo = new ComboBox<>();
         statusCombo.getItems().addAll("Seleksi Berkas", "Interview", "Diterima", "Ditolak");
         statusCombo.setValue(app.statusTahapan);
         statusCombo.setStyle("-fx-background-color: #F7FAFC; -fx-background-radius: 8;");
 
+        // FITUR BARU: DATE PICKER UNTUK INTERVIEW
         DatePicker interviewDatePicker = new DatePicker();
         try {
             if (app.tanggalInterview != null && !app.tanggalInterview.isEmpty()) {

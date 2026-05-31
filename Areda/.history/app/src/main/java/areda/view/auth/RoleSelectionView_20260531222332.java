@@ -40,17 +40,14 @@ public class RoleSelectionView extends StackPane {
         logoIcon.setAlignment(Pos.CENTER);
 
         try {
-
             Image image = new Image(getClass().getResourceAsStream("/logo.png"));
             ImageView logoView = new ImageView(image);
             logoView.setFitWidth(180);
             logoView.setPreserveRatio(true);
             logoIcon.getChildren().add(logoView);
         } catch (Exception e) {
-
             Label fallbackLogo = new Label("A");
-            fallbackLogo.setStyle(
-                    "-fx-font-size: 160px; -fx-font-weight: 900; -fx-text-fill: #0048FF; -fx-font-family: 'Arial';");
+            fallbackLogo.setStyle("-fx-font-size: 160px; -fx-font-weight: 900; -fx-text-fill: #0048FF; -fx-font-family: 'Arial';");
             logoIcon.getChildren().add(fallbackLogo);
         }
 
@@ -64,7 +61,7 @@ public class RoleSelectionView extends StackPane {
         tagline.setTextFill(Color.web("#000000"));
         tagline.setWrapText(true);
         tagline.setTextAlignment(TextAlignment.CENTER);
-        tagline.setMaxWidth(950);
+        tagline.setMaxWidth(950); 
 
         VBox buttonBox = new VBox(20);
         buttonBox.setAlignment(Pos.CENTER);
@@ -86,7 +83,7 @@ public class RoleSelectionView extends StackPane {
 
     private Button createStyledButton(String text) {
         Button btn = new Button(text);
-
+        
         String normalStyle = "-fx-background-color: #0048FF; " +
                 "-fx-text-fill: #FFFFFF; " +
                 "-fx-font-weight: bold; " +
@@ -96,7 +93,7 @@ public class RoleSelectionView extends StackPane {
                 "-fx-padding: 14 0; " +
                 "-fx-cursor: hand;";
 
-        String hoverStyle = "-fx-background-color: #0035D0; " +
+        String hoverStyle = "-fx-background-color: #0035D0; " + 
                 "-fx-text-fill: #FFFFFF; " +
                 "-fx-font-weight: bold; " +
                 "-fx-font-size: 16px; " +

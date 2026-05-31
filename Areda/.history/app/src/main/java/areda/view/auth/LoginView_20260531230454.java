@@ -3,7 +3,6 @@ package areda.view.auth;
 import java.util.function.Consumer;
 import areda.model.DatabaseManager;
 import areda.model.DatabaseManager.Profil;
-import areda.model.DatabaseManager.UserAccount; // IMPORT BARU untuk multi-user
 import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,11 +20,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Circle; // IMPORT untuk centang hijau
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
+import javafx.scene.shape.Circle;
 
 public class LoginView extends HBox {
     private StackPane rightPane;
@@ -153,7 +152,6 @@ public class LoginView extends HBox {
             }
 
             if (isAdminLogin) {
-                // LOGIN ADMIN
                 if (DatabaseManager.validateAdminLogin(emailText, passText)) {
                     if (onLoginSuccess != null)
                         onLoginSuccess.accept("Admin");
@@ -161,18 +159,33 @@ public class LoginView extends HBox {
                     showAlert("Error", "Email atau password Admin salah!");
                 }
             } else {
-                // === LOGIN USER MULTI-USER SYSTEM ===
-                UserAccount account = DatabaseManager.loginUser(emailText, passText);
+                // LOGIN USER - Sistem Single User
+                String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+                if (!emailText.matches(emailRegex)) {
+                    showAlert("Error", "Format email tidak valid!");
+                    return;
+                }
+                if (passText.length() < 6) {
+                    showAlert("Error", "Password minimal 6 karakter!");
+                    return;
+                }
 
-                if (account != null) {
-                    // Login berhasil - ambil profil user yang login
-                    Profil profil = DatabaseManager.getCurrentUserProfil();
+                Profil profil = DatabaseManager.getProfil();
+
+                // Cek apakah profil sudah ada dan email cocok
+                if (!profil.email.isEmpty() && profil.email.equalsIgnoreCase(emailText)) {
+                    // User sudah terdaftar, login berhasil
                     if (onLoginSuccess != null) {
                         onLoginSuccess.accept(profil.nama.isEmpty() ? emailText : profil.nama);
                     }
+                } else if (profil.email.isEmpty()) {
+                    // Profil belum ada, arahkan ke register
+                    showAlert("Info", "Akun belum terdaftar! Silakan daftar terlebih dahulu.");
+                    switchState(AuthState.REGISTER_FORM);
                 } else {
-                    showAlert("Error",
-                            "Email atau password salah!\nAkun belum terdaftar, silakan daftar terlebih dahulu.");
+                    // Email berbeda dengan yang tersimpan
+                    showAlert("Error", "Email belum terdaftar! Silakan daftar terlebih dahulu.");
+                    switchState(AuthState.REGISTER_FORM);
                 }
             }
         });
@@ -228,15 +241,13 @@ public class LoginView extends HBox {
                 return;
             }
 
-            // === REGISTER USER MULTI-USER SYSTEM ===
-            boolean success = DatabaseManager.registerUser(email.getText().trim(), pass.getText(), name.getText());
+            // Simpan profil user
+            Profil profil = DatabaseManager.getProfil();
+            profil.nama = name.getText();
+            profil.email = email.getText().trim();
+            DatabaseManager.updateProfil(profil);
 
-            if (success) {
-                switchState(AuthState.REGISTER_SUCCESS);
-            } else {
-                showAlert("Error", "Email sudah terdaftar! Silakan Login.");
-                switchState(AuthState.LOGIN_MAIN);
-            }
+            switchState(AuthState.REGISTER_SUCCESS);
         });
 
         HBox foot = new HBox(5);
@@ -254,7 +265,7 @@ public class LoginView extends HBox {
     }
 
     private void setupSuccessView(VBox card) {
-        // === NOTIFIKASI CENTANG HIJAU (bukan silang merah) ===
+        // Notifikasi Centang Hijau
         StackPane successIcon = new StackPane();
         successIcon.setPrefSize(60, 60);
 

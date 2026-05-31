@@ -1,9 +1,9 @@
 package areda.view.auth;
 
 import java.util.function.Consumer;
+
 import areda.model.DatabaseManager;
 import areda.model.DatabaseManager.Profil;
-import areda.model.DatabaseManager.UserAccount; // IMPORT BARU untuk multi-user
 import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,13 +21,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Circle; // IMPORT untuk centang hijau
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 public class LoginView extends HBox {
+
     private StackPane rightPane;
     private StackPane loadingOverlay;
     private Consumer<String> onLoginSuccess;
@@ -42,7 +42,7 @@ public class LoginView extends HBox {
         this.onLoginSuccess = onLoginSuccess;
         this.isAdminLogin = isAdminLogin;
         this.onBack = onBack;
-
+        
         this.setPrefSize(950, 650);
         this.setStyle("-fx-background-color: white;");
 
@@ -75,7 +75,7 @@ public class LoginView extends HBox {
         });
 
         StackPane logo = createLogo(100);
-
+        
         Label brand = new Label("Areda Careers");
         brand.setFont(Font.font("Konkhmer Sleokchher", FontWeight.BOLD, 32));
         brand.setTextFill(Color.web("#000000"));
@@ -108,15 +108,14 @@ public class LoginView extends HBox {
         card.setAlignment(Pos.CENTER);
         card.setMaxWidth(380);
         card.setPadding(new Insets(35));
-
+        
         card.setStyle(
                 "-fx-background-color: #C9E9FF; -fx-background-radius: 25; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);");
 
-        String titleText = state == AuthState.REGISTER_FORM ? "REGISTER"
-                : (isAdminLogin ? "LOGIN ADMIN" : "LOGIN USER");
+        String titleText = state == AuthState.REGISTER_FORM ? "REGISTER" : (isAdminLogin ? "LOGIN ADMIN" : "LOGIN USER");
 
         card.getChildren().addAll(
-                createLogo(65),
+                createLogo(65), // Logo kecil di dalam card login
                 new Label(titleText) {
                     {
                         setFont(Font.font("Amaranth", FontWeight.BOLD, 22));
@@ -153,7 +152,6 @@ public class LoginView extends HBox {
             }
 
             if (isAdminLogin) {
-                // LOGIN ADMIN
                 if (DatabaseManager.validateAdminLogin(emailText, passText)) {
                     if (onLoginSuccess != null)
                         onLoginSuccess.accept("Admin");
@@ -161,18 +159,27 @@ public class LoginView extends HBox {
                     showAlert("Error", "Email atau password Admin salah!");
                 }
             } else {
-                // === LOGIN USER MULTI-USER SYSTEM ===
-                UserAccount account = DatabaseManager.loginUser(emailText, passText);
+                String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+                if (!emailText.matches(emailRegex)) {
+                    showAlert("Error", "Format email tidak valid!");
+                    return;
+                }
+                if (passText.length() < 6) {
+                    showAlert("Error", "Password minimal 6 karakter!");
+                    return;
+                }
 
-                if (account != null) {
-                    // Login berhasil - ambil profil user yang login
-                    Profil profil = DatabaseManager.getCurrentUserProfil();
+                Profil profil = DatabaseManager.getProfil();
+
+                if (!profil.nama.isEmpty() && profil.email.equalsIgnoreCase(emailText)) {
                     if (onLoginSuccess != null) {
-                        onLoginSuccess.accept(profil.nama.isEmpty() ? emailText : profil.nama);
+                        onLoginSuccess.accept(profil.nama);
                     }
+                } else if (profil.nama.isEmpty()) {
+                    showAlert("Info", "Akun belum terdaftar! Silakan daftar terlebih dahulu.");
+                    switchState(AuthState.REGISTER_FORM);
                 } else {
-                    showAlert("Error",
-                            "Email atau password salah!\nAkun belum terdaftar, silakan daftar terlebih dahulu.");
+                    showAlert("Error", "Email belum terdaftar!");
                 }
             }
         });
@@ -228,15 +235,19 @@ public class LoginView extends HBox {
                 return;
             }
 
-            // === REGISTER USER MULTI-USER SYSTEM ===
-            boolean success = DatabaseManager.registerUser(email.getText().trim(), pass.getText(), name.getText());
-
-            if (success) {
-                switchState(AuthState.REGISTER_SUCCESS);
-            } else {
+            Profil profilSudahAda = DatabaseManager.getProfil();
+            if (!profilSudahAda.nama.isEmpty() && profilSudahAda.email.equalsIgnoreCase(email.getText().trim())) {
                 showAlert("Error", "Email sudah terdaftar! Silakan Login.");
                 switchState(AuthState.LOGIN_MAIN);
+                return;
             }
+
+            Profil profil = DatabaseManager.getProfil();
+            profil.nama = name.getText();
+            profil.email = email.getText().trim();
+            DatabaseManager.updateProfil(profil);
+
+            switchState(AuthState.REGISTER_SUCCESS);
         });
 
         HBox foot = new HBox(5);
@@ -244,7 +255,7 @@ public class LoginView extends HBox {
         Hyperlink log = new Hyperlink("Masuk");
         log.setStyle("-fx-text-fill: #0048FF; -fx-font-weight: bold;");
         log.setOnAction(e -> switchState(AuthState.LOGIN_MAIN));
-
+        
         Label suddenLabel = new Label("Sudah punya akun?");
         suddenLabel.setFont(Font.font("Andika New Basic", 13));
         suddenLabel.setTextFill(Color.web("#000000"));
@@ -254,21 +265,7 @@ public class LoginView extends HBox {
     }
 
     private void setupSuccessView(VBox card) {
-        // === NOTIFIKASI CENTANG HIJAU (bukan silang merah) ===
-        StackPane successIcon = new StackPane();
-        successIcon.setPrefSize(60, 60);
-
-        Circle greenCircle = new Circle(30, Color.web("#C6F6D5"));
-        greenCircle.setStroke(Color.web("#38A169"));
-        greenCircle.setStrokeWidth(3);
-
-        Label checkMark = new Label("✓");
-        checkMark.setFont(Font.font("Arial", FontWeight.BOLD, 36));
-        checkMark.setTextFill(Color.web("#22543D"));
-
-        successIcon.getChildren().addAll(greenCircle, checkMark);
-
-        Label msg = new Label("Akun Anda Berhasil dibuat,\nSilahkan Login dengan Akun Anda");
+        Label msg = new Label("Akun Anda Berhasil dibuat, Silahkan Login dengan Akun Anda");
         msg.setWrapText(true);
         msg.setTextAlignment(TextAlignment.CENTER);
         msg.setFont(Font.font("Andika New Basic", FontWeight.BOLD, 14));
@@ -276,7 +273,7 @@ public class LoginView extends HBox {
 
         Button btn = createBtn("Masuk");
         btn.setOnAction(e -> switchState(AuthState.LOGIN_MAIN));
-        card.getChildren().addAll(successIcon, msg, btn);
+        card.getChildren().addAll(msg, btn);
     }
 
     private StackPane createLogo(double size) {
@@ -327,10 +324,10 @@ public class LoginView extends HBox {
     private Button createBtn(String text) {
         Button b = new Button(text);
         b.setMaxWidth(Double.MAX_VALUE);
-
+        
         String normal = "-fx-background-color: #0048FF; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 12; -fx-cursor: hand;";
         String hover = "-fx-background-color: #0035D0; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 12; -fx-cursor: hand;";
-
+        
         b.setStyle(normal);
         b.setOnMouseEntered(e -> b.setStyle(hover));
         b.setOnMouseExited(e -> b.setStyle(normal));

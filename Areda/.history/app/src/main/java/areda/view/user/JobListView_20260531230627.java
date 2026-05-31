@@ -128,6 +128,7 @@ public class JobListView extends StackPane {
         Button applyBtn = new Button("Daftar Sekarang");
         applyBtn.setMaxWidth(Double.MAX_VALUE);
 
+        // FITUR BARU: CEK JIKA USER SUDAH DITERIMA
         boolean isAccepted = DatabaseManager.isCurrentUserAccepted();
 
         if (job.sisaSlot == 0 || isAccepted) {

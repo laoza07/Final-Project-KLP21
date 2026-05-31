@@ -272,7 +272,7 @@ public class ManageJobsView extends StackPane {
             try {
                 slots = Integer.parseInt(slotText);
                 if (slots == 0) {
-                    showAlert("Error", "Kuota tidak boleh 0!\nGunakan -1 untuk Full.");
+                    showAlert("Error", "Kuota tidak boleh 0!\nGunakan -1 untuk Full/Unlimited.");
                     return;
                 }
                 if (slots < -1) {

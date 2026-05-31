@@ -1,4 +1,4 @@
-package areda.view.user;
+package areda.view.admin;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -18,30 +19,35 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-public class UserDashboardLayout extends BorderPane {
+public class AdminDashboardLayout extends StackPane {
 
+    private BorderPane mainContainer;
     private VBox sidebar;
     private StackPane contentArea;
+    private StackPane modalOverlay;
     private Runnable onLogout;
-    private String currentUsername;
 
-    private Button btnHome, btnJobs, btnApps, btnSaved, btnProfile;
-    private VBox navMenu;
-
-    public UserDashboardLayout(Runnable onLogout, String username) {
+    public AdminDashboardLayout(Runnable onLogout) {
         this.onLogout = onLogout;
-        this.currentUsername = username;
         this.setPrefSize(1000, 700);
-        this.setStyle("-fx-background-color: white;");
+
+        mainContainer = new BorderPane();
+        mainContainer.setStyle("-fx-background-color: white;");
 
         createSidebar();
-        this.setLeft(sidebar);
+        mainContainer.setLeft(sidebar);
 
         contentArea = new StackPane();
         contentArea.setStyle("-fx-background-color: white;");
-        this.setCenter(contentArea);
+        mainContainer.setCenter(contentArea);
 
-        setContentView(new UserHomeView(currentUsername));
+        setContentView(new AdminHomeView());
+
+        modalOverlay = new StackPane();
+        modalOverlay.setStyle("-fx-background-color: rgba(0,0,0,0.5);");
+        modalOverlay.setVisible(false);
+
+        this.getChildren().addAll(mainContainer, modalOverlay);
     }
 
     private void createSidebar() {
@@ -53,19 +59,16 @@ public class UserDashboardLayout extends BorderPane {
         VBox logoBox = new VBox(5);
         logoBox.setAlignment(Pos.CENTER);
 
-        // PENYESUAIAN LOGO: Mengganti teks 'A' dengan ImageView
+        // PENYESUAIAN LOGO: Menggunakan ImageView untuk logo.png
         StackPane logoImgContainer = new StackPane();
         try {
-            // Mencoba memuat file logo.png dari resource
-            // Pastikan huruf kapitalnya cocok dengan nama file di folder (logo.png /
-            // logo.PNG)
             Image image = new Image(getClass().getResourceAsStream("/logo.png"));
             ImageView logoView = new ImageView(image);
-            logoView.setFitHeight(50); // Menyesuaikan tinggi logo agar pas di sidebar
+            logoView.setFitHeight(50);
             logoView.setPreserveRatio(true);
             logoImgContainer.getChildren().add(logoView);
         } catch (Exception e) {
-            // FALLBACK: Menampilkan huruf 'A' jika gambar gagal dimuat
+            // Fallback ke desain teks 'A' jika gambar tidak ditemukan
             Label letterA = new Label("A");
             letterA.setFont(Font.font("Arial", FontWeight.BOLD, 40));
             letterA.setTextFill(Color.web("#2D3748"));
@@ -87,22 +90,27 @@ public class UserDashboardLayout extends BorderPane {
         logoBox.getChildren().addAll(logoImgContainer, brandName, separator);
         VBox.setMargin(separator, new Insets(15, 0, 20, 0));
 
-        navMenu = new VBox(10);
+        VBox navMenu = new VBox(10);
         navMenu.setAlignment(Pos.TOP_CENTER);
 
-        btnHome = createNavButton("", "Beranda", true);
-        btnJobs = createNavButton("💼", "Lowongan", false);
-        btnApps = createNavButton("👥", "Lamaran", false);
-        btnSaved = createNavButton("🔖", "Markah", false);
-        btnProfile = createNavButton("👤", "Profil", false);
+        Button btnHome = createNavButton("⌂", "Beranda", true);
+        Button btnJobs = createNavButton("", "Kelola Lowongan", false);
+        Button btnApps = createNavButton("👥", "Pelamar", false);
 
-        btnHome.setOnAction(e -> navigateTo("Beranda"));
-        btnJobs.setOnAction(e -> navigateTo("Lowongan"));
-        btnApps.setOnAction(e -> navigateTo("Lamaran"));
-        btnSaved.setOnAction(e -> navigateTo("Markah"));
-        btnProfile.setOnAction(e -> navigateTo("Profil"));
+        btnHome.setOnAction(e -> {
+            updateActiveButton(btnHome, navMenu);
+            setContentView(new AdminHomeView());
+        });
+        btnJobs.setOnAction(e -> {
+            updateActiveButton(btnJobs, navMenu);
+            setContentView(new ManageJobsView());
+        });
+        btnApps.setOnAction(e -> {
+            updateActiveButton(btnApps, navMenu);
+            setContentView(new ApplicantListView());
+        });
 
-        navMenu.getChildren().addAll(btnHome, btnJobs, btnApps, btnSaved, btnProfile);
+        navMenu.getChildren().addAll(btnHome, btnJobs, btnApps);
 
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
@@ -110,43 +118,66 @@ public class UserDashboardLayout extends BorderPane {
         Button btnLogout = createNavButton("⭾", "Keluar", false);
         btnLogout.setStyle(
                 "-fx-background-color: transparent; -fx-text-fill: #2D3748; -fx-font-size: 14px; -fx-alignment: BASELINE_LEFT; -fx-padding: 10 20; -fx-cursor: hand;");
-        btnLogout.setOnAction(e -> {
-            if (onLogout != null)
-                onLogout.run();
-        });
+        btnLogout.setOnAction(e -> showLogoutModal());
 
         sidebar.getChildren().addAll(logoBox, navMenu, spacer, btnLogout);
     }
 
-    public void navigateTo(String menuName) {
-        Button targetBtn;
-        Node view;
+    // ... (Metode showLogoutModal, hideModal, updateActiveButton, getButtonStyle,
+    // createNavButton, dan setContentView tetap sama)
 
-        switch (menuName) {
-            case "Lowongan" -> {
-                targetBtn = btnJobs;
-                view = new JobListView(); // Asumsi kelas ini sudah ada
-            }
-            case "Lamaran" -> {
-                targetBtn = btnApps;
-                view = new MyApplicationsView(); // Asumsi kelas ini sudah ada
-            }
-            case "Markah" -> {
-                targetBtn = btnSaved;
-                view = new SavedJobsView(this); // Asumsi kelas ini sudah ada
-            }
-            case "Profil" -> {
-                targetBtn = btnProfile;
-                view = new ProfileView(); // Asumsi kelas ini sudah ada
-            }
-            default -> {
-                targetBtn = btnHome;
-                view = new UserHomeView(currentUsername); // Asumsi kelas ini sudah ada
-            }
-        }
+    private void showLogoutModal() {
+        VBox modal = new VBox(20);
+        modal.setMaxSize(350, 250);
+        modal.setAlignment(Pos.CENTER);
+        modal.setPadding(new Insets(30));
+        modal.setStyle(
+                "-fx-background-color: white; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 5);");
 
-        updateActiveButton(targetBtn, navMenu);
-        setContentView(view);
+        StackPane icon = new StackPane();
+        Circle circle = new Circle(25, Color.web("#FFFAF0"));
+        circle.setStroke(Color.web("#ECC94B"));
+        Label exclamation = new Label("!");
+        exclamation.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        exclamation.setTextFill(Color.web("#ECC94B"));
+        icon.getChildren().addAll(circle, exclamation);
+
+        Label title = new Label("Keluar dari Akun?");
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        title.setTextFill(Color.web("#1A202C"));
+
+        Label sub = new Label("Apakah anda yakin ingin keluar?");
+        sub.setTextFill(Color.web("#718096"));
+
+        HBox buttons = new HBox(15);
+        buttons.setAlignment(Pos.CENTER);
+
+        Button cancel = new Button("Batal");
+        cancel.setStyle(
+                "-fx-background-color: #EDF2F7; -fx-padding: 10 25; -fx-background-radius: 8; -fx-cursor: hand;");
+        cancel.setOnAction(e -> hideModal());
+
+        Button delete = new Button("Keluar");
+        delete.setStyle(
+                "-fx-background-color: #E53E3E; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 8; -fx-cursor: hand;");
+        delete.setOnAction(e -> {
+            hideModal();
+            if (onLogout != null)
+                onLogout.run();
+        });
+
+        buttons.getChildren().addAll(cancel, delete);
+        modal.getChildren().addAll(icon, title, sub, buttons);
+
+        modalOverlay.getChildren().clear();
+        modalOverlay.getChildren().add(modal);
+        modalOverlay.setVisible(true);
+        mainContainer.setDisable(true);
+    }
+
+    private void hideModal() {
+        modalOverlay.setVisible(false);
+        mainContainer.setDisable(false);
     }
 
     private void updateActiveButton(Button activeBtn, VBox container) {
