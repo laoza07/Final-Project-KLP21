@@ -4,13 +4,15 @@ import java.io.Serializable;
 
 public class UserAccount implements Serializable {
     private static final long serialVersionUID = 1L;
-
     private String email;
     private String password;
-    private UserRole role;
+    private String role;
     private boolean isAccepted;
 
-    public UserAccount(String email, String password, UserRole role) {
+    public UserAccount() {
+    }
+
+    public UserAccount(String email, String password, String role) {
         this.email = email;
         this.password = password;
         this.role = role;
@@ -33,11 +35,11 @@ public class UserAccount implements Serializable {
         this.password = password;
     }
 
-    public UserRole getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(UserRole role) {
+    public void setRole(String role) {
         this.role = role;
     }
 
