@@ -1,0 +1,315 @@
+.label {
+    -fx-text-fill: #1A202C;
+}
+
+.text {
+    -fx-fill: #1A202C;
+}
+
+.text-input {
+    -fx-text-fill: #1A202C;
+    -fx-prompt-text-fill: #A0AEC0;
+}
+
+.text-area .content {
+    -fx-background-color: #F7FAFC;
+}
+
+.text-area {
+    -fx-text-fill: #1A202C;
+    -fx-prompt-text-fill: #A0AEC0;
+}
+
+.bg-auth {
+    -fx-background-color: #C9E9FF;
+    -fx-background-radius: 25;
+}
+
+.btn-auth-primary {
+    -fx-background-color: #0048FF;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-background-radius: 25;
+    -fx-min-width: 320;
+    -fx-padding: 14 0;
+    -fx-cursor: hand;
+}
+
+.btn-auth-primary:hover {
+    -fx-background-color: #0035D0;
+}
+
+
+.sidebar-bg {
+    -fx-background-color: #BEE3F8;
+}
+
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2D3748;
+    -fx-font-size: 14px;
+    -fx-alignment: BASELINE_LEFT;
+    -fx-padding: 12 20;
+    -fx-cursor: hand;
+    -fx-background-radius: 10;
+}
+
+.nav-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.4);
+}
+
+.nav-btn-active {
+    -fx-background-color: white;
+    -fx-text-fill: #2B6CB0;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 10;
+    -fx-alignment: BASELINE_LEFT;
+    -fx-padding: 12 20;
+    -fx-cursor: hand;
+}
+
+.nav-btn-active:hover {
+    -fx-background-color: white;
+}
+
+.job-card {
+    -fx-background-color: #BEE3F8;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+    -fx-padding: 20;
+}
+
+.job-card:hover {
+    -fx-background-color: #A5D8FF;
+}
+
+.modal-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 15, 0, 0, 5);
+}
+
+
+.form-input {
+    -fx-background-color: #F7FAFC;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+    -fx-border-color: transparent;
+    -fx-text-fill: #1A202C;
+    -fx-prompt-text-fill: #A0AEC0;
+}
+
+.form-input:focused {
+    -fx-border-color: #0048FF;
+    -fx-background-color: white;
+    -fx-text-fill: #1A202C;
+}
+
+.pill-diterima {
+    -fx-background-color: #C6F6D5;
+    -fx-text-fill: #22543D;
+    -fx-background-radius: 20;
+    -fx-padding: 5 15;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.pill-ditolak {
+    -fx-background-color: #FED7D7;
+    -fx-text-fill: #9B2C2C;
+    -fx-background-radius: 20;
+    -fx-padding: 5 15;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.pill-interview {
+    -fx-background-color: #BEE3F8;
+    -fx-text-fill: #2B6CB0;
+    -fx-background-radius: 20;
+    -fx-padding: 5 15;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.pill-default {
+    -fx-background-color: #EDF2F7;
+    -fx-text-fill: #4A5568;
+    -fx-background-radius: 20;
+    -fx-padding: 5 15;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+
+.btn-primary {
+    -fx-background-color: #0066CC;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #0052A3;
+}
+
+.btn-danger {
+    -fx-background-color: #E53E3E;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #C53030;
+}
+
+.btn-outline {
+    -fx-background-color: white;
+    -fx-text-fill: #2D3748;
+    -fx-border-color: #CBD5E0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.btn-outline:hover {
+    -fx-background-color: #F7FAFC;
+}
+
+.btn-edit {
+    -fx-background-color: white;
+    -fx-text-fill: #2B6CB0;
+    -fx-border-color: #2B6CB0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 15;
+}
+
+.btn-delete {
+    -fx-background-color: white;
+    -fx-text-fill: #E53E3E;
+    -fx-border-color: #E53E3E;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 15;
+}
+
+.bookmark-active {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2B6CB0;
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+}
+
+.bookmark-inactive {
+    -fx-background-color: transparent;
+    -fx-text-fill: #A0AEC0;
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+}
+
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #F7FAFC;
+    -fx-background-radius: 12 12 0 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-size: 50;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #4A5568;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 0 0 15;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #EDF2F7 transparent;
+    -fx-padding: 5 0;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #FAFCFF;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #EBF8FF;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #BEE3F8;
+}
+
+.table-view .table-cell {
+    -fx-padding: 12 0 12 15;
+    -fx-text-fill: #2D3748;
+    -fx-font-size: 13px;
+}
+
+.avatar-circle {
+    -fx-fill: linear-gradient(to bottom right, #667eea, #764ba2);
+}
+
+.avatar-text {
+    -fx-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-family: "Arial";
+}
+
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.combo-box {
+    -fx-text-fill: #1A202C;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #1A202C;
+}
+
+.date-picker {
+    -fx-text-fill: #1A202C;
+}
+
+.date-picker .text-field {
+    -fx-text-fill: #1A202C;
+}
