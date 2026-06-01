@@ -122,6 +122,7 @@ public class ApplicantListView extends StackPane {
             }
         });
 
+        // 🔥 KOLOM CV
         TableColumn<Lamaran, Void> colCV = new TableColumn<>("CV");
         colCV.setPrefWidth(70);
         colCV.setCellFactory(col -> new TableCell<Lamaran, Void>() {
@@ -148,6 +149,7 @@ public class ApplicantListView extends StackPane {
             }
         });
 
+        // 🔥 KOLOM MOTIVATION LETTER
         TableColumn<Lamaran, Void> colML = new TableColumn<>("ML");
         colML.setPrefWidth(70);
         colML.setCellFactory(col -> new TableCell<Lamaran, Void>() {
@@ -194,6 +196,7 @@ public class ApplicantListView extends StackPane {
         tableView.getColumns().addAll(colNo, colName, colDiv, colDate, colStatus, colCV, colML, colAction);
     }
 
+    // 🔥 METHOD BUKA PDF DENGAN RESOLUSI PATH AMAN
     private void openPdfFile(String filePath, String fileType) {
         if (filePath == null || filePath.isEmpty() || filePath.startsWith("📄")) {
             showAlert("Informasi", fileType + " belum diunggah oleh pelamar.");
@@ -202,6 +205,7 @@ public class ApplicantListView extends StackPane {
         String cleanName = filePath.replace("📄 ", "").trim();
         File pdfFile = new File(cleanName);
 
+        // Fallback cari di folder uploads/ atau working directory
         if (!pdfFile.exists())
             pdfFile = new File("uploads/cv", cleanName);
         if (!pdfFile.exists())
