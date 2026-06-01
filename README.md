@@ -122,11 +122,11 @@ Buka terminal atau command prompt pada direktori root proyek, lalu jalankan peri
 ## 👥 Tim Pengembang
 Proyek ini dikembangkan dengan penuh dedikasi oleh Kelompok 21:
 
-| Nama | NIM | Peran |
-| :--- | :---: | :--- |
-| **Aditiya Izza Fahreza** | H071251069 | Lead Developer / Backend |
-| **Zahrana Kumayla Irfan** | H071251097 | UI/UX Designer / Frontend |
-| **Mawaddah Fajri Lahamuddin** | H071251041 | Database Engineer / QA |
+| Nama | NIM | 
+| :--- | :---: | 
+| **Aditiya Izza Fahreza** | H071251069 | 
+| **Zahrana Kumayla Irfan** | H071251097 |
+| **Mawaddah Fajri Lahamuddin** | H071251041 |
 
 ---
 
