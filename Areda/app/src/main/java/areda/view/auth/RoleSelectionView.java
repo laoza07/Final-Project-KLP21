@@ -18,56 +18,53 @@ public class RoleSelectionView extends StackPane {
     public RoleSelectionView(Runnable onUserLogin, Runnable onAdminLogin) {
 
         this.setStyle("-fx-background-color: #C9E9FF;");
-        this.setPrefSize(1440, 1024);
 
         VBox mainContainer = new VBox();
         mainContainer.setAlignment(Pos.CENTER);
         mainContainer.setPadding(new Insets(40));
 
-        VBox card = new VBox(35);
+        VBox card = new VBox(40);
         card.setAlignment(Pos.CENTER);
-        card.setPrefSize(1440, 1024);
-        card.setMaxSize(1440, 1024);
         card.setStyle("-fx-background-color: #C9E9FF; -fx-background-radius: 25;");
 
         Label welcome = new Label("Selamat Datang!");
-        welcome.setFont(Font.font("Amaranth", FontWeight.NORMAL, 40));
+        welcome.setFont(Font.font("Amaranth", FontWeight.NORMAL, 24));
         welcome.setTextFill(Color.web("#000000"));
 
         StackPane logoIcon = new StackPane();
-        logoIcon.setPrefSize(215, 223);
-        logoIcon.setMaxSize(215, 223);
+        logoIcon.setPrefSize(120, 120);
+        logoIcon.setMaxSize(120, 120);
         logoIcon.setAlignment(Pos.CENTER);
 
         try {
             Image image = new Image(getClass().getResourceAsStream("/logo.png"));
             ImageView logoView = new ImageView(image);
-            logoView.setFitWidth(180);
+            logoView.setFitWidth(100);
             logoView.setPreserveRatio(true);
             logoIcon.getChildren().add(logoView);
         } catch (Exception e) {
 
             Label fallbackLogo = new Label("A");
             fallbackLogo.setStyle(
-                    "-fx-font-size: 160px; -fx-font-weight: 900; -fx-text-fill: #0048FF; -fx-font-family: 'Arial';");
+                    "-fx-font-size: 80px; -fx-font-weight: 900; -fx-text-fill: #0048FF; -fx-font-family: 'Arial';");
             logoIcon.getChildren().add(fallbackLogo);
         }
 
         Label titleLabel = new Label("Areda Careers");
-        titleLabel.setFont(Font.font("Konkhmer Sleokchher", FontWeight.BOLD, 64.4));
+        titleLabel.setFont(Font.font("Konkhmer Sleokchher", FontWeight.BOLD, 48));
         titleLabel.setTextFill(Color.web("#000000"));
         titleLabel.setAlignment(Pos.CENTER);
 
         Label tagline = new Label("Temukan Peluang Terbaik dan Bangun Karier Impianmu Bersama Areda Careers");
-        tagline.setFont(Font.font("Andika New Basic", FontWeight.NORMAL, 25));
+        tagline.setFont(Font.font("Andika New Basic", FontWeight.NORMAL, 16));
         tagline.setTextFill(Color.web("#000000"));
         tagline.setWrapText(true);
         tagline.setTextAlignment(TextAlignment.CENTER);
-        tagline.setMaxWidth(950);
+        tagline.setMaxWidth(600);
 
-        VBox buttonBox = new VBox(20);
+        VBox buttonBox = new VBox(15);
         buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.setPadding(new Insets(20, 0, 0, 0));
+        buttonBox.setPadding(new Insets(10, 0, 0, 0));
 
         Button userLoginBtn = createStyledButton("LOGIN USER");
         Button adminLoginBtn = createStyledButton("LOGIN ADMIN");
@@ -89,19 +86,19 @@ public class RoleSelectionView extends StackPane {
         String normalStyle = "-fx-background-color: #0048FF; " +
                 "-fx-text-fill: #FFFFFF; " +
                 "-fx-font-weight: bold; " +
-                "-fx-font-size: 16px; " +
+                "-fx-font-size: 14px; " +
                 "-fx-background-radius: 25; " +
-                "-fx-min-width: 320; " +
-                "-fx-padding: 14 0; " +
+                "-fx-min-width: 240; " +
+                "-fx-padding: 10 0; " +
                 "-fx-cursor: hand;";
 
         String hoverStyle = "-fx-background-color: #0035D0; " +
                 "-fx-text-fill: #FFFFFF; " +
                 "-fx-font-weight: bold; " +
-                "-fx-font-size: 16px; " +
+                "-fx-font-size: 14px; " +
                 "-fx-background-radius: 25; " +
-                "-fx-min-width: 320; " +
-                "-fx-padding: 14 0; " +
+                "-fx-min-width: 240; " +
+                "-fx-padding: 10 0; " +
                 "-fx-cursor: hand;";
 
         btn.setStyle(normalStyle);
