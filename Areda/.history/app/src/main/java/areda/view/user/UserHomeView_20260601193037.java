@@ -107,4 +107,4 @@ public class UserHomeView extends VBox {
         row.getChildren().addAll(tagLabel, iconCircle, textBox);
         return row;
     }
-}
+}s
