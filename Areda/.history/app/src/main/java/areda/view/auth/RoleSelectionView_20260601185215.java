@@ -17,6 +17,7 @@ public class RoleSelectionView extends StackPane {
 
     public RoleSelectionView(Runnable onUserLogin, Runnable onAdminLogin) {
 
+        // 1 & 2. Pengaturan Background Full Biru (Warna: #C9E9FF)
         this.setStyle("-fx-background-color: #C9E9FF;");
         this.setPrefSize(1440, 1024);
 
@@ -24,16 +25,19 @@ public class RoleSelectionView extends StackPane {
         mainContainer.setAlignment(Pos.CENTER);
         mainContainer.setPadding(new Insets(40));
 
+        // Card background disamakan dengan background utama (full biru)
         VBox card = new VBox(35);
         card.setAlignment(Pos.CENTER);
         card.setPrefSize(1440, 1024);
         card.setMaxSize(1440, 1024);
         card.setStyle("-fx-background-color: #C9E9FF; -fx-background-radius: 25;");
 
+        // 3. Tulisan Selamat Datang
         Label welcome = new Label("Selamat Datang!");
         welcome.setFont(Font.font("Amaranth", FontWeight.NORMAL, 40));
         welcome.setTextFill(Color.web("#000000"));
 
+        // 4. Logo Layout menggunakan ImageView
         StackPane logoIcon = new StackPane();
         logoIcon.setPrefSize(215, 223);
         logoIcon.setMaxSize(215, 223);
@@ -46,18 +50,20 @@ public class RoleSelectionView extends StackPane {
             logoView.setPreserveRatio(true);
             logoIcon.getChildren().add(logoView);
         } catch (Exception e) {
-
+            // CADANGAN: Jika gambar gagal dimuat, tampilkan "A" warna biru (#0048FF)
             Label fallbackLogo = new Label("A");
             fallbackLogo.setStyle(
                     "-fx-font-size: 160px; -fx-font-weight: 900; -fx-text-fill: #0048FF; -fx-font-family: 'Arial';");
             logoIcon.getChildren().add(fallbackLogo);
         }
 
+        // 5. Tulisan "Areda Careers"
         Label titleLabel = new Label("Areda Careers");
         titleLabel.setFont(Font.font("Konkhmer Sleokchher", FontWeight.BOLD, 64.4));
         titleLabel.setTextFill(Color.web("#000000"));
         titleLabel.setAlignment(Pos.CENTER);
 
+        // 6. Tagline
         Label tagline = new Label("Temukan Peluang Terbaik dan Bangun Karier Impianmu Bersama Areda Careers");
         tagline.setFont(Font.font("Andika New Basic", FontWeight.NORMAL, 25));
         tagline.setTextFill(Color.web("#000000"));
@@ -65,6 +71,7 @@ public class RoleSelectionView extends StackPane {
         tagline.setTextAlignment(TextAlignment.CENTER);
         tagline.setMaxWidth(950);
 
+        // 7. Container Tombol
         VBox buttonBox = new VBox(20);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(20, 0, 0, 0));
@@ -77,6 +84,7 @@ public class RoleSelectionView extends StackPane {
 
         buttonBox.getChildren().addAll(userLoginBtn, adminLoginBtn);
 
+        // Memasukkan ke dalam kartu background
         card.getChildren().addAll(welcome, logoIcon, titleLabel, tagline, buttonBox);
 
         mainContainer.getChildren().add(card);
