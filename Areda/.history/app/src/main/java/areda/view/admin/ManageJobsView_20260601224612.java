@@ -124,6 +124,7 @@ public class ManageJobsView extends StackPane {
         cat.setFont(Font.font(12));
         cat.setTextFill(Color.web("#1A202C"));
 
+        // 🔥 LOGIKA DIUBAH: Hapus -1/Unlimited, tampilkan "Full" jika 0
         Label slotLabel = new Label();
         if (job.getSisaSlot() == 0) {
             slotLabel.setText("Full");
@@ -201,6 +202,7 @@ public class ManageJobsView extends StackPane {
         divField.setMaxWidth(Double.MAX_VALUE);
 
         TextField slotField = createInput("Contoh: 1");
+        // 🔥 LOGIKA DIUBAH: Hanya terima angka positif (0-9), blokir tanda minus
         slotField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*")) {
                 slotField.setText(newVal.replaceAll("\\D", ""));
@@ -270,6 +272,7 @@ public class ManageJobsView extends StackPane {
                     return;
                 }
                 slots = Integer.parseInt(slotText);
+                // 🔥 LOGIKA DIUBAH: Minimal harus 1 (tidak boleh 0 atau negatif)
                 if (slots < 1) {
                     showAlert("Error", "Kuota minimal harus 1!");
                     return;

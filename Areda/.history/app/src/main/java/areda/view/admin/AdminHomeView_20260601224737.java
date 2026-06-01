@@ -54,6 +54,7 @@ public class AdminHomeView extends StackPane {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
+        // LONCENG DIHAPUS - hanya logo saja
         StackPane miniLogo = new StackPane();
         miniLogo.setPrefSize(35, 35);
         miniLogo.setStyle(
@@ -165,6 +166,7 @@ public class AdminHomeView extends StackPane {
 
         VBox list = new VBox(15);
         for (Lowongan l : DatabaseManager.getAllLowongan()) {
+            // 🔥 LOGIKA DIUBAH: Hapus -1/Unlimited, tampilkan "Full" jika 0
             String status = l.getSisaSlot() == 0 ? "Full" : "Tersisa " + l.getSisaSlot() + " Slot";
             list.getChildren().add(createDetailCard(l.getJudul(), l.getDivisi(), status));
         }
@@ -240,7 +242,9 @@ public class AdminHomeView extends StackPane {
 
         VBox list = new VBox(15);
         for (Lowongan l : DatabaseManager.getAllLowongan()) {
+            // 🔥 LOGIKA DIUBAH: Hanya tampilkan yang slot > 0 (tidak ada lagi -1)
             if (l.getSisaSlot() > 0) {
+                // 🔥 LOGIKA DIUBAH: Tidak ada lagi kondisi == -1
                 String status = "Tersisa " + l.getSisaSlot() + " Slot";
                 list.getChildren().add(createDetailCard(l.getJudul(), l.getDivisi(), status));
             }

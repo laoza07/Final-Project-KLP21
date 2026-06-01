@@ -336,6 +336,7 @@ public class DatabaseManager {
         return getAllLowongan().size();
     }
 
+    // ✅ FIX: Hanya hitung yang > 0 (tidak ada lagi -1/unlimited)
     public static int getLowonganTersediaCount() {
         return (int) getAllLowongan().stream().filter(l -> l.getSisaSlot() > 0).count();
     }
@@ -590,6 +591,7 @@ public class DatabaseManager {
         }
     }
 
+    // ✅ FIX UTAMA: Transaksi aman dengan rollback di koneksi yang sama
     public static void updateLamaranStatus(String lamaranId, String newStatus) {
         Connection conn = null;
         boolean originalAutoCommit = true;
@@ -669,6 +671,7 @@ public class DatabaseManager {
         }
     }
 
+    // ✅ FIX: Hanya tersedia jika slot > 0
     public static boolean isLowonganAvailable(String lowonganId) {
         Lowongan l = getLowonganById(lowonganId);
         return l != null && l.getSisaSlot() > 0;

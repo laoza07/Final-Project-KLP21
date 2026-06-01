@@ -7,17 +7,27 @@ import areda.view.components.AvatarComponent;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.util.StringConverter;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -122,65 +132,15 @@ public class ApplicantListView extends StackPane {
             }
         });
 
-        TableColumn<Lamaran, Void> colCV = new TableColumn<>("CV");
-        colCV.setPrefWidth(70);
-        colCV.setCellFactory(col -> new TableCell<Lamaran, Void>() {
-            private final Button btnCV = new Button("📄");
-            {
-                btnCV.getStyleClass().add("btn-outline");
-                btnCV.setStyle(
-                        "-fx-text-fill: #2B6CB0; -fx-border-color: #2B6CB0; -fx-font-size: 11px; -fx-padding: 5 10;");
-                btnCV.setOnAction(e -> openPdfFile(getTableView().getItems().get(getIndex()).getCvPath(), "CV"));
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    Lamaran l = getTableView().getItems().get(getIndex());
-                    btnCV.setDisable(
-                            l.getCvPath() == null || l.getCvPath().isEmpty() || l.getCvPath().startsWith("📄"));
-                    setGraphic(btnCV);
-                }
-                setAlignment(Pos.CENTER);
-            }
-        });
-
-        TableColumn<Lamaran, Void> colML = new TableColumn<>("ML");
-        colML.setPrefWidth(70);
-        colML.setCellFactory(col -> new TableCell<Lamaran, Void>() {
-            private final Button btnML = new Button("📝");
-            {
-                btnML.getStyleClass().add("btn-outline");
-                btnML.setStyle(
-                        "-fx-text-fill: #2B6CB0; -fx-border-color: #2B6CB0; -fx-font-size: 11px; -fx-padding: 5 10;");
-                btnML.setOnAction(e -> openPdfFile(getTableView().getItems().get(getIndex()).getMotletPath(),
-                        "Motivation Letter"));
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    Lamaran l = getTableView().getItems().get(getIndex());
-                    btnML.setDisable(l.getMotletPath() == null || l.getMotletPath().isEmpty()
-                            || l.getMotletPath().startsWith("📄"));
-                    setGraphic(btnML);
-                }
-                setAlignment(Pos.CENTER);
-            }
-        });
-
         TableColumn<Lamaran, Void> colAction = new TableColumn<>("Aksi");
         colAction.setCellFactory(col -> new TableCell<Lamaran, Void>() {
             private final Button btn = new Button("Detail");
             {
                 btn.getStyleClass().add("btn-edit");
-                btn.setOnAction(e -> showDetailModal(getTableView().getItems().get(getIndex())));
+                btn.setOnAction(e -> {
+                    Lamaran lamaran = getTableView().getItems().get(getIndex());
+                    showDetailModal(lamaran);
+                });
             }
 
             @Override
@@ -191,59 +151,65 @@ public class ApplicantListView extends StackPane {
             }
         });
 
-        tableView.getColumns().addAll(colNo, colName, colDiv, colDate, colStatus, colCV, colML, colAction);
+        tableView.getColumns().addAll(colNo, colName, colDiv, colDate, colStatus, colAction);
     }
 
-    private void openPdfFile(String filePath, String fileType) {
-        if (filePath == null || filePath.isEmpty() || filePath.startsWith("📄")) {
-            showAlert("Informasi", fileType + " belum diunggah oleh pelamar.");
-            return;
-        }
-        String cleanName = filePath.replace("📄 ", "").trim();
-        File pdfFile = new File(cleanName);
+    private void refreshTable() {
+        String selectedDivisi = lowonganFilter.getValue();
+        String searchText = searchField.getText().toLowerCase();
 
-        if (!pdfFile.exists())
-            pdfFile = new File("uploads/cv", cleanName);
-        if (!pdfFile.exists())
-            pdfFile = new File("uploads/motlet", cleanName);
-        if (!pdfFile.exists())
-            pdfFile = new File(System.getProperty("user.dir"), cleanName);
+        List<Lamaran> filtered = DatabaseManager.getAllLamaran().stream().filter(lamaran -> {
+            Lowongan l = DatabaseManager.getLowonganById(lamaran.getIdLowongan());
+            String divisi = (l != null) ? l.getDivisi() : "Unknown";
+            boolean matchDivisi = selectedDivisi.equals("Semua") || divisi.equals(selectedDivisi);
+            boolean matchSearch = searchText.isEmpty() || lamaran.getNamaPelamar().toLowerCase().contains(searchText);
+            return matchDivisi && matchSearch;
+        }).collect(Collectors.toList());
 
-        if (!pdfFile.exists()) {
-            showManualOpenDialog(fileType,
-                    "Path tidak ditemukan. Pastikan file tersimpan di folder 'uploads/' atau direktori project.");
-            return;
-        }
-
-        try {
-            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
-                Desktop.getDesktop().open(pdfFile);
-            } else {
-                showManualOpenDialog(fileType, pdfFile.getAbsolutePath());
-            }
-        } catch (IOException | SecurityException e) {
-            System.err.println("Error buka file: " + e.getMessage());
-            showManualOpenDialog(fileType, pdfFile.getAbsolutePath());
-        }
+        tableView.getItems().setAll(filtered);
+        if (filtered.isEmpty())
+            tableView.setPlaceholder(new Label("Tidak ada data pelamar."));
     }
 
-    private void showManualOpenDialog(String fileType, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Buka File Manual");
-        alert.setHeaderText(fileType + " tidak dapat dibuka otomatis");
-        alert.setContentText(message);
-        ButtonType copyBtn = new ButtonType("Salin Path", ButtonBar.ButtonData.OK_DONE);
-        ButtonType closeBtn = new ButtonType("Tutup", ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().setAll(copyBtn, closeBtn);
-        alert.showAndWait().ifPresent(response -> {
-            if (response == copyBtn) {
-                Clipboard clipboard = Clipboard.getSystemClipboard();
-                ClipboardContent content = new ClipboardContent();
-                content.putString(message);
-                clipboard.setContent(content);
-                showAlert("Tersalin", "Path telah disalin ke clipboard.");
-            }
-        });
+    private HBox createHeader() {
+        HBox header = new HBox();
+        header.setAlignment(Pos.CENTER_LEFT);
+        VBox titleBox = new VBox(5);
+        Label title = new Label("Pelamar");
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        title.setTextFill(Color.web("#1A202C"));
+        Label subtitle = new Label("Daftar pelamar pekerjaan");
+        subtitle.setFont(Font.font("Arial", 12));
+        subtitle.setTextFill(Color.web("#718096"));
+        titleBox.getChildren().addAll(title, subtitle);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        header.getChildren().addAll(titleBox, spacer);
+        return header;
+    }
+
+    private HBox createFilterBar() {
+        HBox bar = new HBox(15);
+        bar.setAlignment(Pos.CENTER_LEFT);
+
+        lowonganFilter = new ComboBox<>();
+        lowonganFilter.getItems().addAll(DatabaseManager.getAllDivisi());
+        lowonganFilter.setValue("Semua");
+        lowonganFilter.getStyleClass().add("form-input");
+        lowonganFilter.setPrefWidth(200);
+        lowonganFilter.setOnAction(e -> refreshTable());
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        searchField = new TextField();
+        searchField.setPromptText("🔍 Cari Nama...");
+        searchField.getStyleClass().add("form-input");
+        searchField.setPrefWidth(200);
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> refreshTable());
+
+        bar.getChildren().addAll(lowonganFilter, spacer, searchField);
+        return bar;
     }
 
     private void showDetailModal(Lamaran app) {
@@ -251,6 +217,7 @@ public class ApplicantListView extends StackPane {
         modal.setMaxSize(650, 550);
         modal.setPadding(new Insets(30));
         modal.getStyleClass().add("modal-card");
+
         ScrollPane modalScroll = new ScrollPane(modal);
         modalScroll.setFitToWidth(true);
         modalScroll.setStyle(
@@ -270,8 +237,10 @@ public class ApplicantListView extends StackPane {
         top.getChildren().addAll(title, spacer, close);
 
         HBox contentBox = new HBox(30);
+
         VBox profileInfo = new VBox(20);
         profileInfo.setPrefWidth(320);
+
         HBox nameBox = new HBox(15);
         nameBox.setAlignment(Pos.CENTER_LEFT);
         AvatarComponent avatar = new AvatarComponent(app.getNamaPelamar(), 45);
@@ -300,35 +269,44 @@ public class ApplicantListView extends StackPane {
         Label dateLbl = new Label("Jadwal Interview (Opsional)");
         dateLbl.setFont(Font.font("Arial", FontWeight.BOLD, 12));
         dateLbl.setTextFill(Color.web("#4A5568"));
+
+        // 🔥 FIX: DatePicker dengan StringConverter untuk hindari
+        // DateTimeParseException
         DatePicker interviewDatePicker = new DatePicker();
         interviewDatePicker.getStyleClass().add("form-input");
         interviewDatePicker.setMaxWidth(Double.MAX_VALUE);
+
+        // Set value dengan safe parsing
         if (app.getTanggalInterview() != null && !app.getTanggalInterview().isEmpty()) {
             try {
-                interviewDatePicker.setValue(java.time.LocalDate.parse(app.getTanggalInterview()));
+                interviewDatePicker.setValue(LocalDate.parse(app.getTanggalInterview()));
             } catch (Exception ignored) {
+                interviewDatePicker.setValue(null);
             }
         }
-        interviewDatePicker.setConverter(new javafx.util.StringConverter<java.time.LocalDate>() {
-            private final java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
-                    .ofPattern("yyyy-MM-dd");
+
+        // 🔥 FIX: StringConverter untuk handle input invalid dari user
+        interviewDatePicker.setConverter(new StringConverter<LocalDate>() {
+            private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
             @Override
-            public String toString(java.time.LocalDate date) {
-                return date != null ? formatter.format(date) : "";
+            public String toString(LocalDate date) {
+                return (date != null) ? formatter.format(date) : "";
             }
 
             @Override
-            public java.time.LocalDate fromString(String string) {
+            public LocalDate fromString(String string) {
                 if (string == null || string.isEmpty())
                     return null;
                 try {
-                    return java.time.LocalDate.parse(string, formatter);
+                    return LocalDate.parse(string, formatter);
                 } catch (Exception e) {
+                    // ✅ Return null jika format invalid, jangan throw exception
                     return null;
                 }
             }
         });
+
         dateBox.getChildren().addAll(dateLbl, interviewDatePicker);
 
         Button saveBtn = new Button("Simpan Perubahan");
@@ -342,29 +320,36 @@ public class ApplicantListView extends StackPane {
             refreshTable();
             hideModal();
         });
+
         profileInfo.getChildren().addAll(nameBox, statusBox, dateBox, saveBtn);
 
         VBox docs = new VBox(15);
         docs.setPadding(new Insets(20));
         docs.setStyle("-fx-background-color: #EBF8FF; -fx-background-radius: 15;");
         docs.setPrefWidth(220);
+
         Label docsTitle = new Label("Dokumen Terunggah");
         docsTitle.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         docsTitle.setTextFill(Color.web("#2B6CB0"));
+
         Label cvLabel = new Label(
                 (app.getCvPath() == null || app.getCvPath().isEmpty()) ? "❌ Belum ada CV" : "📄    " + app.getCvPath());
         cvLabel.setWrapText(true);
         cvLabel.setMaxWidth(200);
         cvLabel.setTextFill(Color.web("#2D3748"));
-        Label mlLabel = new Label((app.getMotletPath() == null || app.getMotletPath().isEmpty()) ? "❌ Belum ada ML"
-                : "📄    " + app.getMotletPath());
+
+        Label mlLabel = new Label(
+                (app.getMotletPath() == null || app.getMotletPath().isEmpty()) ? "❌ Belum ada ML"
+                        : "📄    " + app.getMotletPath());
         mlLabel.setWrapText(true);
         mlLabel.setMaxWidth(200);
         mlLabel.setTextFill(Color.web("#2D3748"));
+
         docs.getChildren().addAll(docsTitle, cvLabel, mlLabel);
 
         contentBox.getChildren().addAll(profileInfo, docs);
         modal.getChildren().addAll(top, contentBox);
+
         modalOverlay.getChildren().clear();
         modalOverlay.getChildren().add(modalScroll);
         modalOverlay.setVisible(true);
@@ -374,64 +359,5 @@ public class ApplicantListView extends StackPane {
     private void hideModal() {
         modalOverlay.setVisible(false);
         mainContent.setDisable(false);
-    }
-
-    private void refreshTable() {
-        String selectedDivisi = lowonganFilter.getValue();
-        String searchText = searchField.getText().toLowerCase();
-        List<Lamaran> filtered = DatabaseManager.getAllLamaran().stream().filter(lamaran -> {
-            Lowongan l = DatabaseManager.getLowonganById(lamaran.getIdLowongan());
-            String divisi = (l != null) ? l.getDivisi() : "Unknown";
-            return (selectedDivisi.equals("Semua") || divisi.equals(selectedDivisi))
-                    && (searchText.isEmpty() || lamaran.getNamaPelamar().toLowerCase().contains(searchText));
-        }).collect(Collectors.toList());
-        tableView.getItems().setAll(filtered);
-        if (filtered.isEmpty())
-            tableView.setPlaceholder(new Label("Tidak ada data pelamar."));
-    }
-
-    private HBox createHeader() {
-        HBox header = new HBox();
-        header.setAlignment(Pos.CENTER_LEFT);
-        VBox titleBox = new VBox(5);
-        Label title = new Label("Pelamar");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        title.setTextFill(Color.web("#1A202C"));
-        Label subtitle = new Label("Daftar pelamar pekerjaan");
-        subtitle.setFont(Font.font("Arial", 12));
-        subtitle.setTextFill(Color.web("#718096"));
-        titleBox.getChildren().addAll(title, subtitle);
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        header.getChildren().addAll(titleBox, spacer);
-        return header;
-    }
-
-    private HBox createFilterBar() {
-        HBox bar = new HBox(15);
-        bar.setAlignment(Pos.CENTER_LEFT);
-        lowonganFilter = new ComboBox<>();
-        lowonganFilter.getItems().addAll(DatabaseManager.getAllDivisi());
-        lowonganFilter.setValue("Semua");
-        lowonganFilter.getStyleClass().add("form-input");
-        lowonganFilter.setPrefWidth(200);
-        lowonganFilter.setOnAction(e -> refreshTable());
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        searchField = new TextField();
-        searchField.setPromptText("🔍 Cari Nama...");
-        searchField.getStyleClass().add("form-input");
-        searchField.setPrefWidth(200);
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> refreshTable());
-        bar.getChildren().addAll(lowonganFilter, spacer, searchField);
-        return bar;
-    }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(title.equals("Error") ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }
