@@ -25,14 +25,33 @@
     -fx-background-radius: 25;
 }
 
+.auth-card {
+    -fx-background-color: #C9E9FF;
+    -fx-background-radius: 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 15, 0, 0, 5);
+}
+
+.btn-register-link {
+    -fx-background-color: #0048FF;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+.auth-left-pane {
+    -fx-background-color: white;
+}
+
 .btn-auth-primary {
     -fx-background-color: #0048FF;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
-    -fx-font-size: 16px;
+    -fx-font-size: 14px;
     -fx-background-radius: 25;
-    -fx-min-width: 320;
-    -fx-padding: 14 0;
+    -fx-min-width: 240;
+    -fx-padding: 10 0;
     -fx-cursor: hand;
 }
 

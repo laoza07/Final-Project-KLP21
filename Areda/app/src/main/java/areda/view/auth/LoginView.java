@@ -1,19 +1,29 @@
 package areda.view.auth;
 
 import java.util.function.Consumer;
+
 import areda.model.DatabaseManager;
 import areda.model.Profil;
 import areda.model.UserAccount;
 import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
@@ -33,15 +43,17 @@ public class LoginView extends HBox {
         this.onLoginSuccess = onLoginSuccess;
         this.isAdminLogin = isAdminLogin;
         this.onBack = onBack;
-        this.setStyle("-fx-background-color: #C9E9FF;");
+        this.setStyle("-fx-background-color: white;");
 
         VBox leftCol = createLeftColumn();
+        HBox.setHgrow(leftCol, Priority.ALWAYS);
+
         rightPane = new StackPane();
-        rightPane.setPrefWidth(550);
-        rightPane.setStyle("-fx-background-color: #C9E9FF;");
+        HBox.setHgrow(rightPane, Priority.ALWAYS);
+        rightPane.setStyle("-fx-background-color: white;");
 
         loadingOverlay = new StackPane();
-        loadingOverlay.setStyle("-fx-background-color: rgba(0,0,0,0.1);");
+        loadingOverlay.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-background-radius: 30;");
         loadingOverlay.setVisible(false);
         loadingOverlay.getChildren().add(new ProgressIndicator());
 
@@ -50,31 +62,36 @@ public class LoginView extends HBox {
     }
 
     private VBox createLeftColumn() {
-        VBox left = new VBox(25);
-        left.setPrefWidth(400);
-        left.setPadding(new Insets(50, 40, 50, 40));
-        left.setAlignment(Pos.CENTER_LEFT);
-        left.setStyle("-fx-background-color: white;");
+        VBox left = new VBox(30);
+        left.setMinWidth(400);
+        left.setMaxWidth(500);
+        left.setPadding(new Insets(60, 40, 40, 60));
+        left.setAlignment(Pos.TOP_LEFT);
 
-        Button backBtn = new Button("← Kembali");
+        HBox header = new HBox(15);
+        header.setAlignment(Pos.CENTER_LEFT);
+        StackPane logo = createLogo(60);
+        Label brand = new Label("AREDA CAREERS");
+        brand.setFont(Font.font("System", FontWeight.BOLD, 28));
+        brand.setTextFill(Color.web("#1A202C"));
+        header.getChildren().addAll(logo, brand);
+
+        Label desc = new Label("Areda Careers membantu anda menemukan lowongan kerja terbaik dengan proses lamaran yang mudah dan cepat.");
+        desc.setFont(Font.font("Andika New Basic", FontWeight.NORMAL, 16));
+        desc.setWrapText(true);
+        desc.setTextFill(Color.web("#4A5568"));
+        desc.setMaxWidth(350);
+        desc.setLineSpacing(5);
+
+        Button backBtn = new Button("← Kembali ke Beranda");
         backBtn.setStyle(
-                "-fx-background-color: transparent; -fx-text-fill: #718096; -fx-font-size: 14px; -fx-cursor: hand;");
+                "-fx-background-color: transparent; -fx-text-fill: #0048FF; -fx-font-weight: bold; -fx-font-size: 14px; -fx-cursor: hand; -fx-padding: 20 0 0 0;");
         backBtn.setOnAction(e -> {
             if (onBack != null)
                 onBack.run();
         });
 
-        StackPane logo = createLogo(100);
-        Label brand = new Label("Areda Careers");
-        brand.setFont(Font.font("Konkhmer Sleokchher", FontWeight.BOLD, 32));
-        brand.setTextFill(Color.web("#1A202C"));
-
-        Label desc = new Label("Temukan Peluang Terbaik dan Bangun Karier Impianmu Bersama Areda Careers.");
-        desc.setFont(Font.font("Andika New Basic", FontWeight.NORMAL, 15));
-        desc.setWrapText(true);
-        desc.setTextFill(Color.web("#4A5568"));
-
-        left.getChildren().addAll(backBtn, logo, brand, desc);
+        left.getChildren().addAll(header, desc, backBtn);
         return left;
     }
 
@@ -92,24 +109,33 @@ public class LoginView extends HBox {
 
     private void renderState(AuthState state) {
         rightPane.getChildren().clear();
-        VBox card = new VBox(18);
+        VBox card = new VBox(15);
         card.setAlignment(Pos.CENTER);
-        card.setMaxWidth(380);
-        card.setPadding(new Insets(35));
-        card.setStyle("-fx-background-color: white; -fx-background-radius: 25; " +
-                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);");
+        card.setMaxWidth(420);
+        card.setPadding(new Insets(40));
+        card.getStyleClass().add("auth-card");
 
-        String titleText = state == AuthState.REGISTER_FORM ? "REGISTER"
-                : (isAdminLogin ? "LOGIN ADMIN" : "LOGIN USER");
-        Label titleLabel = new Label(titleText);
-        titleLabel.setFont(Font.font("Amaranth", FontWeight.BOLD, 22));
+        StackPane smallLogo = createLogo(45);
+        Label cardTitle = new Label("Areda Careers");
+        cardTitle.setFont(Font.font("System", FontWeight.BOLD, 18));
+
+        Line line = new Line(0, 0, 280, 0);
+        line.setStroke(Color.web("#4A5568"));
+        line.setOpacity(0.2);
+
+        String mainTitle = state == AuthState.REGISTER_FORM ? "USER REGISTRATION"
+                : (isAdminLogin ? "ADMIN LOGIN" : "USER LOGIN");
+        Label titleLabel = new Label(mainTitle);
+        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 24));
         titleLabel.setTextFill(Color.web("#1A202C"));
 
-        Line line = new Line(0, 0, 220, 0);
-        line.setStroke(Color.web("#0048FF"));
-        line.setOpacity(0.3);
+        Label subTitle = new Label("Masuk untuk Melanjutkan pencarian pekerjaan terbaikmu!");
+        subTitle.setFont(Font.font("System", 13));
+        subTitle.setTextFill(Color.web("#4A5568"));
+        subTitle.setWrapText(true);
+        subTitle.setTextAlignment(TextAlignment.CENTER);
 
-        card.getChildren().addAll(createLogo(65), titleLabel, line);
+        card.getChildren().addAll(smallLogo, cardTitle, line, titleLabel, subTitle);
 
         switch (state) {
             case LOGIN_MAIN, LOGIN_FAILED -> setupLoginForm(card, state);
@@ -120,9 +146,12 @@ public class LoginView extends HBox {
     }
 
     private void setupLoginForm(VBox card, AuthState state) {
+        VBox form = new VBox(10);
+        form.setAlignment(Pos.CENTER_LEFT);
+
         TextField email = createInput("email@domain.com");
         PasswordField pass = createPass("password...");
-        Button login = createBtn(isAdminLogin ? "LOGIN ADMIN" : "LOGIN USER");
+        Button login = createBtn(isAdminLogin ? "LOGIN ADMIN" : "LOGIN");
 
         login.setOnAction(e -> {
             String emailText = email.getText().trim();
@@ -144,34 +173,36 @@ public class LoginView extends HBox {
                 UserAccount account = DatabaseManager.loginUser(emailText, passText);
                 if (account != null) {
                     Profil profil = DatabaseManager.getCurrentUserProfil();
-
                     String displayName = (profil.getNama() != null && !profil.getNama().isEmpty()) ? profil.getNama()
                             : emailText;
                     if (onLoginSuccess != null) {
                         onLoginSuccess.accept(displayName);
                     }
                 } else {
-                    if (DatabaseManager.isEmailRegistered(emailText)) {
-                        showAlert("Error", "Password salah! Silakan coba lagi.");
-                    } else {
-                        showAlert("Error", "Akun belum terdaftar!\nSilakan daftar terlebih dahulu.");
-                    }
+                    showAlert("Error", "Email atau password salah!");
                 }
             }
         });
 
-        VBox footer = new VBox(5);
+        VBox footer = new VBox(12);
         footer.setAlignment(Pos.CENTER);
+        footer.setPadding(new Insets(10, 0, 0, 0));
+
         if (!isAdminLogin) {
-            Label txt = new Label("Belum punya akun?");
-            txt.setFont(Font.font("Andika New Basic", 13));
+            Label txt = new Label("belum punya akun? Daftar Sekarang!");
+            txt.setFont(Font.font("System", 13));
             txt.setTextFill(Color.web("#4A5568"));
-            Hyperlink link = new Hyperlink("Daftar Sekarang!");
-            link.setStyle("-fx-text-fill: #0048FF; -fx-font-weight: bold;");
-            link.setOnAction(e -> switchState(AuthState.REGISTER_FORM));
-            footer.getChildren().addAll(txt, link);
+
+            Button regBtn = new Button("Daftar di sini");
+            regBtn.getStyleClass().add("btn-register-link");
+            regBtn.setOnAction(e -> switchState(AuthState.REGISTER_FORM));
+
+            footer.getChildren().addAll(txt, regBtn);
         }
-        card.getChildren().addAll(createLabel("Masukkan Email Anda"), email, createLabel("Masukkan Password"), pass,
+
+        card.getChildren().addAll(
+                createLabel("Masukkan Email Anda"), email,
+                createLabel("Masukkan Password"), pass,
                 login, footer);
     }
 
